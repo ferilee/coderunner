@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Runner: Game Edukasi Barisan & Deret</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Fira Code & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"Fira Code"', 'monospace'],
+            sans: ['"Inter"', 'sans-serif']
+          },
+          colors: {
+            cyber: {
+              dark: '#0a0d14',
+              card: '#111827',
+              border: '#1f293d',
+              neonGreen: '#10b981',
+              neonCyan: '#06b6d4',
+              neonPurple: '#a855f7',
+              neonYellow: '#f59e0b',
+              neonRed: '#ef4444'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(1000%); }
+    }
+    .scanline-effect {
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 10px;
+      background: linear-gradient(to bottom, rgba(16, 185, 129, 0), rgba(16, 185, 129, 0.25), rgba(16, 185, 129, 0));
+      animation: scanline 8s linear infinite;
+      pointer-events: none;
+    }
+    .glow-green {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.35);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0d131f;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #1f293d;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #374151;
+    }
+  </style>
+</head>
+<body class="bg-cyber-dark text-slate-100 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-emerald-500 selection:text-black">
+  <header class="border-b border-cyber-border bg-cyber-card/80 backdrop-blur-md sticky top-0 z-40 px-4 py-3">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="showScreen('home')">
+        <div class="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 font-mono font-bold text-lg glow-green">
+          &gt;_
+        </div>
+        <div>
+          <h1 class="font-bold text-lg tracking-wider text-emerald-400 font-mono flex items-center gap-2">
+            CODE RUNNER <span class="text-xs bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-1.5 py-0.5 rounded uppercase">RPL Ed</span>
+          </h1>
+          <p class="text-xs text-slate-400">Algoritma Barisan & Deret Matematika</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="soundToggleBtn" onclick="toggleAudio()" class="px-3 py-1.5 rounded-lg border border-cyber-border bg-slate-800/80 hover:bg-slate-700 text-xs font-mono flex items-center gap-1.5 transition">
+          <span id="soundIcon">🔊</span> <span class="hidden sm:inline" id="soundText">Audio: ON</span>
+        </button>
+        <button onclick="openModal('materiModal')" class="px-3 py-1.5 rounded-lg border border-cyan-500/40 bg-cyan-950/30 hover:bg-cyan-900/50 text-cyan-300 text-xs font-mono transition flex items-center gap-1">
+          <span>📖</span> <span class="hidden sm:inline">Materi Rumus</span>
+        </button>
+        <button onclick="openModal('helpModal')" class="px-3 py-1.5 rounded-lg border border-purple-500/40 bg-purple-950/30 hover:bg-purple-900/50 text-purple-300 text-xs font-mono transition flex items-center gap-1">
+          <span>❓</span> <span class="hidden sm:inline">Petunjuk</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4 flex flex-col justify-center relative">
+    <div class="scanline-effect"></div>
+
+    <!-- SCREEN 1: HOME SCREEN -->
+    <section id="homeScreen" class="py-6 flex flex-col items-center text-center transition-all duration-300">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono mb-4 animate-pulse">
+        <span>●</span> SERVER STATUS: ANOMALY DETECTED IN ARRAY SEQUENCES
+      </div>
+
+      <h2 class="text-4xl sm:text-6xl font-extrabold tracking-tight font-mono text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-300 to-indigo-400 drop-shadow mb-4">
+        &lt;CODE_RUNNER /&gt;
+      </h2>
+      <p class="text-slate-300 max-w-2xl text-sm sm:text-base leading-relaxed mb-6">
+        Sistem utama database sekolah mengalami gangguan akibat deret data corrupt. Kendalikan programmer handal, debug barisan aritmetika & geometri, dan kembalikan server online sebelum sistem overload!
+      </p>
+
+      <!-- Character Selector Preview -->
+      <div class="w-full max-w-2xl bg-cyber-card border border-cyber-border rounded-2xl p-4 sm:p-5 mb-8 text-left">
+        <div class="flex items-center justify-between mb-3 border-b border-cyber-border pb-2">
+          <span class="text-xs font-mono uppercase text-emerald-400 font-semibold tracking-wider">Pilih Persona Programmer:</span>
+          <span id="selectedCharRole" class="text-xs font-mono text-cyan-300">Front-End Dev</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3" id="characterOptions">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <button onclick="showScreen('levelSelect')" class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-mono font-bold tracking-wide shadow-lg shadow-emerald-500/20 transform hover:-translate-y-0.5 active:translate-y-0 transition">
+          ▶ MULAI DEBUGGING
+        </button>
+        <button onclick="openModal('materiModal')" class="px-6 py-3.5 rounded-xl border border-cyber-border bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 font-mono text-sm transition">
+          📚 Rangkuman Materi
+        </button>
+        <button onclick="openModal('highScoreModal')" class="px-6 py-3.5 rounded-xl border border-cyber-border bg-slate-800/80 hover:bg-slate-700/80 text-amber-300 font-mono text-sm transition">
+          🏆 Rekor Skor
+        </button>
+      </div>
+
+      <!-- Quick Concept Tags -->
+      <div class="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl w-full text-xs font-mono text-slate-400">
+        <div class="p-3 rounded-lg border border-cyber-border/70 bg-slate-900/60">
+          <div class="text-emerald-400 font-semibold mb-1">⚡ Aritmetika</div>
+          <div>Beda konstan ($b$), suku ke-$n$ ($U_n$), total sum ($S_n$).</div>
+        </div>
+        <div class="p-3 rounded-lg border border-cyber-border/70 bg-slate-900/60">
+          <div class="text-cyan-400 font-semibold mb-1">🚀 Geometri</div>
+          <div>Pengganda rasio ($r$), suku eksponensial ($a \cdot r^{n-1}$).</div>
+        </div>
+        <div class="p-3 rounded-lg border border-cyber-border/70 bg-slate-900/60">
+          <div class="text-purple-400 font-semibold mb-1">💻 RPL Coding</div>
+          <div>Array index, for-loops, validasi bug runtime.</div>
+        </div>
+        <div class="p-3 rounded-lg border border-cyber-border/70 bg-slate-900/60">
+          <div class="text-amber-400 font-semibold mb-1">🎮 Runner Quest</div>
+          <div>3 Energi, timer kritis, hint bertingkat edukatif.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="levelSelectScreen" class="hidden py-4 transition-all duration-300">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <button onclick="showScreen('home')" class="text-xs font-mono text-slate-400 hover:text-emerald-400 flex items-center gap-1 mb-1 transition">
+            ← KEMBALI KE BERANDA
+          </button>
+          <h2 class="text-2xl font-bold font-mono text-emerald-400">PILIH MISI SERVER</h2>
+        </div>
+        <div class="text-right font-mono text-xs text-slate-400">
+          Level Terbuka: <span id="unlockedLevelsCount" class="text-emerald-400 font-bold">1 / 5</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="levelCardsContainer">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <section id="gameScreen" class="hidden flex-col gap-4 py-2 transition-all duration-300">
+      <!-- HUD Bar: Score, Level, Time, Energy -->
+      <div class="bg-cyber-card border border-cyber-border rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+        <div class="flex items-center gap-4">
+          <div>
+            <span class="text-slate-400 block text-[10px]">MISI AKTIF</span>
+            <span id="hudLevelTitle" class="text-emerald-400 font-bold">Level 1: Pattern Beginner</span>
+          </div>
+          <div class="h-6 w-px bg-cyber-border hidden sm:block"></div>
+          <div>
+            <span class="text-slate-400 block text-[10px]">PROGRESS</span>
+            <span id="hudQuestionProgress" class="text-cyan-400 font-bold">Rintangan 1 / 3</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <!-- Energy Hearts -->
+          <div class="flex items-center gap-1 bg-slate-900 px-2.5 py-1.5 rounded-lg border border-cyber-border">
+            <span class="text-slate-400 mr-1 text-[10px]">ENERGI:</span>
+            <span id="hudHearts" class="text-red-500 font-bold text-sm tracking-wider">❤️❤️️❤️</span>
+          </div>
+
+          <!-- Timer -->
+          <div class="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded-lg border border-cyber-border">
+            <span class="text-slate-400 text-[10px]">TIMER:</span>
+            <span id="hudTimer" class="text-amber-400 font-bold font-mono text-sm">30s</span>
+          </div>
+
+          <!-- Score -->
+          <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-lg border border-cyber-border">
+            <span class="text-slate-400 text-[10px]">SKOR:</span>
+            <span id="hudScore" class="text-emerald-400 font-bold text-sm">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Canvas Runner Window (Server Lab Theme) -->
+      <div class="relative w-full rounded-2xl overflow-hidden border border-cyber-border bg-[#05070d] shadow-2xl">
+        <canvas id="runnerCanvas" class="w-full h-44 sm:h-56 block"></canvas>
+        <div id="runnerCanvasNotification" class="absolute top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-lg font-mono text-xs font-bold transition-opacity duration-300 opacity-0 pointer-events-none">
+          SYSTEM NOTICE
+        </div>
+      </div>
+
+      <!-- Question & Code Terminal Area -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Code & Pattern Terminal (7 cols) -->
+        <div class="lg:col-span-7 bg-cyber-card border border-cyber-border rounded-xl p-4 flex flex-col">
+          <div class="flex items-center justify-between border-b border-cyber-border pb-2 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-red-500/80 inline-block"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/80 inline-block"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500/80 inline-block"></span>
+              <span class="text-xs font-mono text-slate-400 ml-2" id="terminalFileName">debug_sequence.js</span>
+            </div>
+            <span id="questionTypeBadge" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+              Aritmetika
+            </span>
+          </div>
+
+          <!-- Story Prompt -->
+          <div id="storyContext" class="text-xs text-slate-300 mb-3 bg-slate-900/60 p-2.5 rounded border border-cyber-border/80">
+            Sistem mendeteksi array data log server yang belum lengkap. Analisis polanya!
+          </div>
+
+          <!-- Code Snippet Box -->
+          <div class="bg-black/80 rounded-lg p-3 border border-slate-800 font-mono text-xs text-emerald-300 overflow-x-auto custom-scrollbar mb-3">
+            <pre id="codeSnippetBox"><code>// Loading script...</code></pre>
+          </div>
+
+          <!-- Question Text -->
+          <div class="mt-auto">
+            <h3 id="currentQuestionText" class="font-semibold text-sm sm:text-base text-white">
+              Berapakah nilai data berikutnya?
+            </h3>
+          </div>
+        </div>
+
+        <!-- Options & Action Panel (5 cols) -->
+        <div class="lg:col-span-5 bg-cyber-card border border-cyber-border rounded-xl p-4 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-mono text-slate-400 uppercase tracking-wide">PILIHAN LOGIKA:</span>
+              <button onclick="requestHint()" id="btnUseHint" class="text-[11px] font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 px-2 py-1 rounded transition">
+                💡 Butuh Hint? (-10)
+              </button>
+            </div>
+
+            <!-- Hint Display Box (collapsible) -->
+            <div id="hintContainer" class="hidden mb-3 p-2.5 rounded bg-amber-950/20 border border-amber-500/30 text-xs font-mono text-amber-300">
+              <div class="flex items-center justify-between text-[10px] text-amber-400/80 mb-1">
+                <span id="hintLevelText">HINT TAHAP 1</span>
+                <span>-10 Poin</span>
+              </div>
+              <p id="hintContentText">Perhatikan selisih tetap antar angka di barisan array.</p>
+            </div>
+
+            <!-- Option Buttons -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="optionsContainer">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Help Info Footer -->
+          <div class="mt-4 pt-3 border-t border-cyber-border flex items-center justify-between text-[11px] font-mono text-slate-400">
+            <span>Benar: <b class="text-emerald-400">+100 Poin</b></span>
+            <span>Salah: <b class="text-red-400">-1 Energi</b></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="levelSummaryScreen" class="hidden py-6 text-center max-w-xl mx-auto w-full transition-all duration-300">
+      <div class="bg-cyber-card border border-cyber-border rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl" id="summaryIconBadge">
+          🎉
+        </div>
+        <h2 id="summaryStatusTitle" class="text-2xl sm:text-3xl font-bold font-mono text-emerald-400 mb-2">
+          MISI BERHASIL DIAKSES!
+        </h2>
+        <p id="summarySubtitle" class="text-slate-300 text-xs sm:text-sm mb-6">
+          Bug pada deret data berhasil dinormalisasi. Server berjalan stabil!
+        </p>
+
+        <!-- Stats breakdown -->
+        <div class="grid grid-cols-3 gap-3 bg-slate-900/80 p-4 rounded-xl border border-cyber-border mb-6 text-left font-mono">
+          <div>
+            <div class="text-[10px] text-slate-400">SKOR LEVEL</div>
+            <div id="summaryLevelScore" class="text-emerald-400 font-bold text-lg">+0</div>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-400">SISA ENERGI</div>
+            <div id="summaryEnergyRemain" class="text-cyan-400 font-bold text-lg">3/3</div>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-400">TOTAL SKOR</div>
+            <div id="summaryTotalScore" class="text-amber-400 font-bold text-lg">0</div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button id="btnNextLevel" onclick="nextLevelOrSelect()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono font-bold transition">
+            Lanjut Level Berikutnya ➜
+          </button>
+          <button onclick="showScreen('levelSelect')" class="w-full sm:w-auto px-6 py-3 rounded-xl border border-cyber-border bg-slate-800 hover:bg-slate-700 font-mono text-sm text-slate-300 transition">
+            Pilih Level Lain
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="explanationModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-cyber-card border border-cyber-border rounded-2xl max-w-lg w-full p-5 font-mono text-left animate-in fade-in duration-200">
+      <div class="flex items-center justify-between border-b border-cyber-border pb-3 mb-3">
+        <h3 id="modalFeedbackTitle" class="font-bold text-base flex items-center gap-2">
+          <span>✅</span> Jawaban Benar!
+        </h3>
+        <span id="modalPoinDelta" class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">+100 Poin</span>
+      </div>
+
+      <div class="mb-4">
+        <span class="text-xs text-slate-400 block mb-1">LOGIKA PEMBAHASAN MATEMATIKA & KODE:</span>
+        <div id="modalExplanationContent" class="text-xs text-slate-200 bg-slate-900/90 p-3 rounded-lg border border-slate-800 space-y-2 leading-relaxed">
+          <!-- Text inserted by JS -->
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button id="btnModalNextStep" onclick="proceedToNextObstacle()" class="px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition">
+          Lanjutkan Lari ➜
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="materiModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-cyber-card border border-cyber-border rounded-2xl max-w-2xl w-full p-6 font-mono text-left max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-cyber-border pb-3 mb-4">
+        <h3 class="font-bold text-emerald-400 text-lg flex items-center gap-2">
+          📖 Rangkuman Barisan & Deret untuk RPL
+        </h3>
+        <button onclick="closeModal('materiModal')" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <div class="overflow-y-auto custom-scrollbar pr-2 space-y-4 text-xs text-slate-300 flex-1">
+        <!-- Modul 1 -->
+        <div class="p-3 rounded-lg bg-slate-900 border border-cyber-border">
+          <h4 class="text-emerald-400 font-bold mb-1">1. Barisan Aritmetika (Arithmetic Progression)</h4>
+          <p class="mb-2">Barisan bilangan dengan selisih tetap (disebut <b>beda</b> atau <code class="text-emerald-300">b</code>) di antara suku-sukunya.</p>
+          <div class="bg-black/60 p-2 rounded text-emerald-200 mb-2">
+            Rumus Suku ke-n: <b>U<sub>n</sub> = a + (n - 1)b</b><br>
+            Beda: <b>b = U<sub>n</sub> - U<sub>n-1</sub></b>
+          </div>
+          <p class="text-slate-400">Kasus RPL: Penambahan memori cache statis tiap siklus loop: <code class="text-cyan-300">dataSize += 5</code>.</p>
+        </div>
+
+        <!-- Modul 2 -->
+        <div class="p-3 rounded-lg bg-slate-900 border border-cyber-border">
+          <h4 class="text-cyan-400 font-bold mb-1">2. Barisan Geometri (Geometric Progression)</h4>
+          <p class="mb-2">Barisan bilangan dengan perbandingan pengali tetap (disebut <b>rasio</b> atau <code class="text-cyan-300">r</code>).</p>
+          <div class="bg-black/60 p-2 rounded text-cyan-200 mb-2">
+            Rumus Suku ke-n: <b>U<sub>n</sub> = a · r<sup>(n - 1)</sup></b><br>
+            Rasio: <b>r = U<sub>n</sub> / U<sub>n-1</sub></b>
+          </div>
+          <p class="text-slate-400">Kasus RPL: Skalabilitas user traffic viral, replikasi mikro-service: <code class="text-cyan-300">traffic *= 2</code>.</p>
+        </div>
+
+        <!-- Modul 3 -->
+        <div class="p-3 rounded-lg bg-slate-900 border border-cyber-border">
+          <h4 class="text-purple-400 font-bold mb-1">3. Deret Aritmetika (Series Sum)</h4>
+          <p class="mb-2">Penjumlahan suku-suku barisan aritmetika dari suku ke-1 sampai ke-n.</p>
+          <div class="bg-black/60 p-2 rounded text-purple-200 mb-2">
+            Rumus Deret: <b>S<sub>n</sub> = n/2 · (a + U<sub>n</sub>)</b> atau <b>S<sub>n</sub> = n/2 · [2a + (n - 1)b]</b>
+          </div>
+          <p class="text-slate-400">Kasus RPL: Menghitung total kumulatif tugas backlog scrum yang selesai dalam 1 sprint.</p>
+        </div>
+
+        <!-- Modul 4 -->
+        <div class="p-3 rounded-lg bg-slate-900 border border-cyber-border">
+          <h4 class="text-amber-400 font-bold mb-1">4. Implementasi JavaScript Loop & Barisan</h4>
+          <pre class="bg-black/80 p-2.5 rounded text-amber-200 overflow-x-auto"><code>// Aritmetika: for loop akumulator
+let total = 0;
+for (let n = 1; n <= 5; n++) {
+  let un = 2 + (n - 1) * 3;
+  total += un;
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-cyber-border text-right">
+        <button onclick="closeModal('materiModal')" class="px-5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-mono">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="helpModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-cyber-card border border-cyber-border rounded-2xl max-w-md w-full p-6 font-mono text-left">
+      <div class="flex items-center justify-between border-b border-cyber-border pb-3 mb-3">
+        <h3 class="font-bold text-purple-400 text-base flex items-center gap-2">
+          🎮 Cara Bermain Code Runner
+        </h3>
+        <button onclick="closeModal('helpModal')" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <ul class="space-y-2.5 text-xs text-slate-300">
+        <li class="flex items-start gap-2">
+          <span class="text-emerald-400 font-bold">1.</span>
+          <span><b>Karakter Berlari:</b> Karaktermu berlari melewati server room. Di depan terdapat bug firewall barisan data.</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-emerald-400 font-bold">2.</span>
+          <span><b>Analisis Kode:</b> Amati potongan kode, array, dan variabel untuk menentukan rumus matematika yang cocok.</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-emerald-400 font-bold">3.</span>
+          <span><b>Skor & Lompatan:</b> Jawaban benar (+100 poin) membuat karakter melompati rintangan. Cepat menjawab sebelum timer habis memberi bonus +25 poin!</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-red-400 font-bold">4.</span>
+          <span><b>Energi (Nyawa):</b> Memiliki 3 nyawa. Jawaban salah/kehabisan waktu mengurangi 1 energi. Jika habis, restart misi.</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-amber-400 font-bold">5.</span>
+          <span><b>Fitur Hint:</b> Jika ragu, klik bantuan hint bertahap (Identifikasi pola → Rumus → Perhitungan). Menggunakan hint memotong -10 poin.</span>
+        </li>
+      </ul>
+
+      <div class="mt-5 text-right">
+        <button onclick="closeModal('helpModal')" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 font-bold text-xs">
+          Mengerti!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="highScoreModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-cyber-card border border-cyber-border rounded-2xl max-w-md w-full p-6 font-mono text-left">
+      <div class="flex items-center justify-between border-b border-cyber-border pb-3 mb-4">
+        <h3 class="font-bold text-amber-400 text-base flex items-center gap-2">
+          🏆 Rekor Skor Debugging
+        </h3>
+        <button onclick="closeModal('highScoreModal')" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <div class="space-y-3 mb-6">
+        <div class="flex items-center justify-between p-3 rounded-lg bg-slate-900 border border-cyber-border">
+          <div class="flex items-center gap-2">
+            <span class="text-amber-400 font-bold">#1</span>
+            <span id="topPlayerRole" class="text-xs text-slate-200">Cybersecurity Specialist</span>
+          </div>
+          <span id="topScoreValue" class="text-emerald-400 font-bold text-sm">1,250 Pts</span>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-slate-900 border border-cyber-border">
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400 font-bold">#2</span>
+            <span class="text-xs text-slate-200">Database Engineer</span>
+          </div>
+          <span class="text-cyan-400 font-bold text-sm">950 Pts</span>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-slate-900 border border-cyber-border">
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400 font-bold">#3</span>
+            <span class="text-xs text-slate-200">Programmer Pemula</span>
+          </div>
+          <span class="text-slate-300 font-bold text-sm">700 Pts</span>
+        </div>
+      </div>
+
+      <div class="text-right">
+        <button onclick="closeModal('highScoreModal')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* In-memory Audio Synthesizer (No external asset dependency) */
+    let audioCtx = null;
+    let isSoundMuted = false;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          audioCtx = new AudioContext();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.1, gainVal = 0.15) {
+      if (isSoundMuted) return;
+      try {
+        initAudio();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gainNode.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.debug('Audio playback note:', e);
+      }
+    }
+
+    function soundJump() {
+      if (isSoundMuted) return;
+      playTone(330, 'square', 0.08, 0.1);
+      setTimeout(() => playTone(660, 'square', 0.12, 0.1), 70);
+    }
+
+    function soundSuccess() {
+      if (isSoundMuted) return;
+      playTone(440, 'triangle', 0.09, 0.15);
+      setTimeout(() => playTone(587.33, 'triangle', 0.1, 0.15), 90);
+      setTimeout(() => playTone(880, 'triangle', 0.18, 0.2), 190);
+    }
+
+    function soundError() {
+      if (isSoundMuted) return;
+      playTone(160, 'sawtooth', 0.2, 0.2);
+      setTimeout(() => playTone(110, 'sawtooth', 0.25, 0.2), 120);
+    }
+
+    function soundLevelClear() {
+      if (isSoundMuted) return;
+      const notes = [523.25, 659.25, 783.99, 1046.5];
+      notes.forEach((f, idx) => {
+        setTimeout(() => playTone(f, 'sine', 0.16, 0.2), idx * 110);
+      });
+    }
+
+    function toggleAudio() {
+      isSoundMuted = !isSoundMuted;
+      document.getElementById('soundIcon').innerText = isSoundMuted ? '🔇' : '🔊';
+      document.getElementById('soundText').innerText = isSoundMuted ? 'Audio: OFF' : 'Audio: ON';
+    }
+
+    const CHARACTERS = [
+      { id: 'frontend', name: 'Front-End Dev', role: 'UI/UX & Loops', color: '#10b981', symbol: '🎨', desc: 'Ahli visual & logika sequence array' },
+      { id: 'debugger', name: 'Debugger Specialist', role: 'Bug Hunter', color: '#06b6d4', symbol: '🔍', desc: 'Pendeteksi rumus beda & selisih data' },
+      { id: 'database', name: 'DB Specialist', role: 'Data Queries', color: '#f59e0b', symbol: '💾', desc: 'Pakar pola penumpukan record server' },
+      { id: 'security', name: 'Cyber Security', role: 'Exploit Patch', color: '#a855f7', symbol: '🛡️', desc: 'Pemecah enkripsi deret geometri' },
+      { id: 'beginner', name: 'Programmer Pemula', role: 'Junior Coder', color: '#ec4899', symbol: '🌱', desc: 'Semangat tinggi mempelajari pola coding' }
+    ];
+
+    let selectedCharacter = CHARACTERS[0];
+
+    const LEVELS = [
+      {
+        id: 1,
+        title: "Level 1: Pattern Beginner",
+        badge: "Pola & Suku Bilangan",
+        desc: "Mengenali pola bilangan awal dan nilai suku berikutnya pada barisan array sederhana.",
+        questions: [
+          {
+            type: "aritmatika",
+            story: "Log file mencatat kenaikan jumlah koneksi websocket tiap detik. Tentukan nilai index berikutnya!",
+            code: "let connections = [2, 4, 6, 8, ...];\n// Berapakah elemen array selanjutnya?",
+            question: "Berapakah suku berikutnya dari barisan sequence tersebut?",
+            options: ["9", "10", "12", "14"],
+            answer: "10",
+            hints: [
+              "Perhatikan selisih tiap suku: 4 - 2 = 2, 6 - 4 = 2. Selisih selalu konstan 2.",
+              "Rumus suku aritmetika sederhana: Uₙ = Uₙ₋₁ + beda.",
+              "Elemen terakhir adalah 8. Maka suku berikutnya: 8 + 2 = 10."
+            ],
+            explanation: "Barisan ini memiliki beda konstan b = 2. Suku ke-5 = 8 + 2 = 10."
+          },
+          {
+            type: "aritmatika",
+            story: "Sebuah counter id order bertambah secara teratur dalam kode sistem transaksi.",
+            code: "let sequence = [3, 6, 9, 12, ...];\nlet difference = sequence[1] - sequence[0];",
+            question: "Berapakah nilai variabel 'difference' (beda) pada barisan kode di atas?",
+            options: ["2", "3", "4", "6"],
+            answer: "3",
+            hints: [
+              "Beda (b) didapat dari selisih suku kedua dikurangi suku pertama.",
+              "Gunakan: b = U₂ - U₁.",
+              "Hitung: 6 - 3 = 3."
+            ],
+            explanation: "Nilai beda barisan aritmetika adalah U₂ - U₁ = 6 - 3 = 3."
+          },
+          {
+            type: "aritmatika",
+            story: "Periksa output dari array cache yang berisi pola kelipatan ganjil berikut:",
+            code: "let ports = [5, 9, 13, 17, ...];\n// Temukan ports[4] (suku ke-5)!",
+            question: "Berapakah nilai suku berikutnya pada ports[4]?",
+            options: ["19", "20", "21", "22"],
+            answer: "21",
+            hints: [
+              "Cari bedanya: 9 - 5 = 4.",
+              "Periksa suku selanjutnya: 13 + 4 = 17.",
+              "Tambahkan 4 ke suku terakhir: 17 + 4 = 21."
+            ],
+            explanation: "Beda barisan b = 9 - 5 = 4. Maka suku ke-5 adalah 17 + 4 = 21."
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Level 2: Arithmetic Debugger",
+        badge: "Barisan Aritmetika Un",
+        desc: "Menghitung nilai suku ke-(n) berdasarkan rumus algoritma formal Un = a + (n-1)b.",
+        questions: [
+          {
+            type: "aritmatika",
+            story: "Sebuah program menghasilkan 10 data pada proses pertama. Setiap proses berikutnya menghasilkan 5 data lebih banyak.",
+            code: "let firstData = 10;   // a = 10\nlet difference = 5;  // b = 5\nlet process = 8;     // n = 8\nlet result = firstData + (process - 1) * difference;",
+            question: "Berapa banyak data yang dihasilkan pada proses ke-8?",
+            options: ["40", "45", "50", "55"],
+            answer: "45",
+            hints: [
+              "Gunakan rumus suku ke-n: Uₙ = a + (n - 1) * b.",
+              "Substitusikan: a = 10, b = 5, n = 8.",
+              "U₈ = 10 + (8 - 1) * 5 = 10 + (7 * 5) = 10 + 35 = 45."
+            ],
+            explanation: "Diketahui a = 10, b = 5, n = 8. Maka U₈ = 10 + (7 × 5) = 45 data."
+          },
+          {
+            type: "aritmatika",
+            story: "Server logging error mulai dari 12 log pada jam pertama dan bertambah 4 log setiap jam.",
+            code: "let a = 12;\nlet b = 4;\n// Hitung log pada jam ke-12 (U12)",
+            question: "Berapa jumlah log error pada jam ke-12?",
+            options: ["52", "56", "60", "64"],
+            answer: "56",
+            hints: [
+              "a = 12, b = 4, n = 12.",
+              "U₁₂ = a + (12 - 1) * b.",
+              "U₁₂ = 12 + (11 * 4) = 12 + 44 = 56."
+            ],
+            explanation: "U₁₂ = 12 + (11 × 4) = 12 + 44 = 56 log."
+          },
+          {
+            type: "aritmatika",
+            story: "Diketahui suku ke-3 suatu barisan memori adalah 15 dan bedanya 3. Berapakah nilai suku pertamanya (a)?",
+            code: "// U3 = 15, b = 3\n// U3 = a + (3 - 1)b => 15 = a + 2*3\nlet a = 15 - 6;",
+            question: "Berapakah suku pertama (a) dari alokasi memori tersebut?",
+            options: ["6", "9", "12", "3"],
+            answer: "9",
+            hints: [
+              "Rumus U₃ = a + 2b = 15.",
+              "Karena b = 3, maka 2 * b = 6.",
+              "Maka a = 15 - 6 = 9."
+            ],
+            explanation: "15 = a + (3 - 1)(3) => 15 = a + 6 => a = 9."
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Level 3: Geometric Hacker",
+        badge: "Barisan Geometri & Rasio",
+        desc: "Mengidentifikasi faktor pengali rasio (r) dan menghitung pertumbuhan eksponensial Un = a * r^(n-1).",
+        questions: [
+          {
+            type: "geometri",
+            story: "Pengguna aplikasi baru terdaftar 2 orang pada hari pertama. Setiap hari jumlahnya berlipat ganda 3 kali lipat.",
+            code: "let initialUsers = 2; // a = 2\nlet ratio = 3;        // r = 3\nlet day = 5;          // n = 5\nlet users = initialUsers * (ratio ** (day - 1));",
+            question: "Berapa jumlah user pada hari ke-5?",
+            options: ["108", "162", "243", "486"],
+            answer: "162",
+            hints: [
+              "Ini adalah barisan geometri dengan rasio r = 3.",
+              "Gunakan rumus Un = a * r^(n-1). Hari ke-5 artinya n = 5.",
+              "U₅ = 2 * (3^(5 - 1)) = 2 * (3^4) = 2 * 81 = 162."
+            ],
+            explanation: "a = 2, r = 3, n = 5. U₅ = 2 × 3⁴ = 2 × 81 = 162 user."
+          },
+          {
+            type: "geometri",
+            story: "Ditemukan barisan data transmisi byte jaringan: [2, 6, 18, 54, ...].",
+            code: "let sequence = [2, 6, 18, 54, ...];\nlet ratio = sequence[1] / sequence[0];",
+            question: "Berapakah rasio (r) dan suku ke-5 barisan transmisi tersebut?",
+            options: ["r = 2, U₅ = 108", "r = 3, U₅ = 162", "r = 3, U₅ = 108", "r = 4, U₅ = 216"],
+            answer: "r = 3, U₅ = 162",
+            hints: [
+              "Rasio r = 6 / 2 = 3.",
+              "Suku ke-5 didapat dari suku ke-4 dikali rasio.",
+              "54 * 3 = 162."
+            ],
+            explanation: "Rasio r = 6/2 = 3. Suku ke-5 = 54 × 3 = 162."
+          },
+          {
+            type: "geometri",
+            story: "Sebuah worm virus menggandakan payloadnya menjadi 2 kali lipat setiap 10 menit (r = 2). Awalnya ada 5 payload.",
+            code: "let a = 5; let r = 2; let n = 4;\nlet payloads = a * Math.pow(r, n - 1);",
+            question: "Berapa banyak payload pada siklus ke-4?",
+            options: ["30", "40", "50", "80"],
+            answer: "40",
+            hints: [
+              "a = 5, r = 2, n = 4.",
+              "U₄ = 5 * (2^(4 - 1)) = 5 * (2^3).",
+              "2 pangkat 3 = 8. Maka 5 * 8 = 40."
+            ],
+            explanation: "U₄ = 5 × 2³ = 5 × 8 = 40 payload."
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "Level 4: Series Builder",
+        badge: "Deret Aritmetika Sn",
+        desc: "Menghitung akumulasi jumlah data Sn menggunakan formula sigma loop atau Sn = n/2 * (2a + (n-1)b).",
+        questions: [
+          {
+            type: "deret",
+            story: "Tim developer menyelesaikan 4 task pada hari pertama. Setiap hari berikutnya jumlah task bertambah 3 task lebih banyak.",
+            code: "let a = 4; // hari 1\nlet b = 3; // penambahan tiap hari\nlet n = 7; // total 7 hari\n// Hitung total kumulatif tugas S7",
+            question: "Berapa total seluruh task yang terselesaikan selama 7 hari?",
+            options: ["84", "91", "96", "102"],
+            answer: "91",
+            hints: [
+              "Cari suku ke-7 dulu: U₇ = 4 + (7 - 1)*3 = 4 + 18 = 22.",
+              "Gunakan rumus deret Sn = (n / 2) * (a + Un).",
+              "S₇ = (7 / 2) * (4 + 22) = 3.5 * 26 = 91."
+            ],
+            explanation: "U₇ = 4 + (6 × 3) = 22. Maka S₇ = 7/2 × (4 + 22) = 7/2 × 26 = 91 task."
+          },
+          {
+            type: "deret",
+            story: "Kompilasi kode program menghitung deret bilangan genap pertama: 2 + 4 + 6 + 8 + 10.",
+            code: "let sum = 0;\nfor(let i = 1; i <= 5; i++) {\n  sum += 2 * i;\n}",
+            question: "Berapakah nilai akhir variabel 'sum' dari 5 suku pertama?",
+            options: ["25", "30", "35", "40"],
+            answer: "30",
+            hints: [
+              "Penjumlahan: 2 + 4 + 6 + 8 + 10.",
+              "Rumus Sn = 5/2 * (2 + 10) = 2.5 * 12.",
+              "2.5 * 12 = 30."
+            ],
+            explanation: "S₅ = 5/2 × (2 + 10) = 5/2 × 12 = 30."
+          },
+          {
+            type: "deret",
+            story: "Sebuah server menyimpan backup: hari 1 = 10GB, pertambahan per hari b = 2GB. Berapa total kapasitas dalam 6 hari?",
+            code: "let a = 10, b = 2, n = 6;\nlet totalGB = (n / 2) * (2 * a + (n - 1) * b);",
+            question: "Berapa total penyimpanan (S₆) dalam gigabyte?",
+            options: ["75 GB", "85 GB", "90 GB", "96 GB"],
+            answer: "90 GB",
+            hints: [
+              "Gunakan Sn = (n/2) * [2a + (n - 1)b].",
+              "2a = 20, (n - 1)b = 5 * 2 = 10. Di dalam kurung: 20 + 10 = 30.",
+              "S₆ = (6 / 2) * 30 = 3 * 30 = 90."
+            ],
+            explanation: "S₆ = 3 × [20 + 10] = 3 × 30 = 90 GB."
+          }
+        ]
+      },
+      {
+        id: 5,
+        title: "Level 5: Final Bug Server",
+        badge: "Tantangan Campuran Aritmetika & Geometri",
+        desc: "Koreksi bug runtime kompleks dengan menggabungkan deteksi jenis barisan dan perbaikan script.",
+        questions: [
+          {
+            type: "campuran",
+            story: "Audit data server menemukan array response: [4, 8, 16, 32, 64]. Programmer junior ragu jenis barisannya.",
+            code: "let data = [4, 8, 16, 32, 64];\n// Analisis: Apakah aritmetika atau geometri? Berapa parameternya?",
+            question: "Manakah klasifikasi dan parameter barisan yang tepat?",
+            options: [
+              "Barisan Aritmetika dengan b = 4",
+              "Barisan Geometri dengan rasio r = 2",
+              "Barisan Geometri dengan rasio r = 4",
+              "Bukan barisan matematika"
+            ],
+            answer: "Barisan Geometri dengan rasio r = 2",
+            hints: [
+              "Periksa perbandingan suku berurutan: 8/4 = 2, 16/8 = 2, 32/16 = 2.",
+              "Karena perbandingannya (bukan selisihnya) yang tetap, ini adalah barisan geometri.",
+              "Rasionya adalah r = 2."
+            ],
+            explanation: "Rasio antar suku tetap yaitu 8/4 = 16/8 = 2. Jadi ini adalah barisan geometri dengan rasio r = 2."
+          },
+          {
+            type: "campuran",
+            story: "Temukan baris bug pada implementasi perhitungan Suku ke-n Aritmetika berikut:",
+            code: "function getTerm(a, b, n) {\n  let un = a + (n) * b; // Baris Bug?\n  return un;\n}",
+            question: "Bagaimanakah sintaks yang benar untuk baris rumus di atas?",
+            options: [
+              "let un = a + (n - 1) * b;",
+              "let un = a * (n - 1) + b;",
+              "let un = a + (n + 1) * b;",
+              "let un = a + b ** n;"
+            ],
+            answer: "let un = a + (n - 1) * b;",
+            hints: [
+              "Rumus standar suku ke-n barisan aritmetika adalah Un = a + (n - 1)b.",
+              "Kode asli lupa mengurangi nilai n dengan 1.",
+              "Opsi yang tepat menyertakan (n - 1)."
+            ],
+            explanation: "Rumus matematis suku ke-n aritmetika memerlukan faktor (n - 1)b, bukan n * b."
+          },
+          {
+            type: "campuran",
+            story: "Kunci pintu server terakhir dienkripsi dengan hasil jumlah: S₄ deret geometri dari 3 + 6 + 12 + 24.",
+            code: "let a = 3; let r = 2; let n = 4;\n// S4 = a * (r^n - 1) / (r - 1)",
+            question: "Berapakah nilai kode akses server (S₄)?",
+            options: ["42", "45", "48", "50"],
+            answer: "45",
+            hints: [
+              "Penjumlahan langsung: 3 + 6 + 12 + 24.",
+              "3 + 6 = 9. 9 + 12 = 21. 21 + 24 = 45.",
+              "Atau rumus: 3 * (2⁴ - 1) / (2 - 1) = 3 * (16 - 1) = 3 * 15 = 45."
+            ],
+            explanation: "S₄ = 3 + 6 + 12 + 24 = 45 (atau dengan rumus Sn geometri: 3 × (2⁴ - 1) = 45)."
+          }
+        ]
+      }
+    ];
+
+    let gameState = {
+      currentLevelIndex: 0,
+      currentQuestionIndex: 0,
+      score: 0,
+      energy: 3,
+      timer: 30,
+      timerInterval: null,
+      hintsUsedInQuestion: 0,
+      unlockedLevels: 1,
+      isPaused: false,
+      topScore: 750
+    };
+
+    const canvas = document.getElementById('runnerCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let runnerAnimationId = null;
+    let runnerX = 60;
+    let runnerY = 130;
+    let runnerBaseY = 130;
+    let runnerVY = 0;
+    let isJumping = false;
+    let jumpTargetX = null;
+    let particles = [];
+    let serverNodes = [];
+    let obstaclePos = { x: 420, active: true, label: 'BUG: firewall' };
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      runnerBaseY = rect.height - 48;
+      runnerY = runnerBaseY;
+      obstaclePos.x = rect.width * 0.72;
+    }
+
+    // Populate futuristic server racks in background
+    function initServerEnvironment() {
+      serverNodes = [];
+      const count = 12;
+      for (let i = 0; i < count; i++) {
+        serverNodes.push({
+          x: i * 70,
+          height: 50 + Math.random() * 40,
+          blink: Math.random() > 0.5,
+          speed: 1.2
+        });
+      }
+    }
+
+    function createDustParticles(x, y, color = '#10b981') {
+      for (let i = 0; i < 8; i++) {
+        particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 3 - 1.5,
+          vy: (Math.random() - 0.5) * 2 - 1,
+          life: 1,
+          color: color
+        });
+      }
+    }
+
+    function triggerJumpSuccess() {
+      soundJump();
+      isJumping = true;
+      runnerVY = -7.5;
+      showCanvasToast('JUMP OVER BUG // VALIDATED!', '#10b981');
+      createDustParticles(runnerX + 15, runnerY + 25, '#10b981');
+    }
+
+    function triggerGlitchError() {
+      soundError();
+      showCanvasToast('RUNTIME ERROR // ENERGY -1', '#ef4444');
+      createDustParticles(runnerX + 15, runnerY + 10, '#ef4444');
+      // subtle screen shake effect
+      canvas.classList.add('animate-ping');
+      setTimeout(() => canvas.classList.remove('animate-ping'), 200);
+    }
+
+    function showCanvasToast(msg, bg) {
+      const notif = document.getElementById('runnerCanvasNotification');
+      notif.innerText = msg;
+      notif.style.backgroundColor = bg;
+      notif.style.color = '#000';
+      notif.classList.remove('opacity-0');
+      notif.classList.add('opacity-100');
+      setTimeout(() => {
+        notif.classList.remove('opacity-100');
+        notif.classList.add('opacity-0');
+      }, 1400);
+    }
+
+    let runCycle = 0;
+    function animateRunnerLoop() {
+      const width = canvas.getBoundingClientRect().width;
+      const height = canvas.getBoundingClientRect().height;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Draw Tech Background Grid
+      ctx.strokeStyle = 'rgba(31, 41, 61, 0.4)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < width; x += 30) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+
+      // 2. Draw Server Nodes scrolling
+      serverNodes.forEach(node => {
+        node.x -= node.speed;
+        if (node.x < -60) node.x = width + 20;
+
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(node.x, height - 48 - node.height, 35, node.height);
+        ctx.strokeStyle = '#1e293b';
+        ctx.strokeRect(node.x, height - 48 - node.height, 35, node.height);
+
+        // Blinking LED
+        ctx.fillStyle = (Math.sin(runCycle * 0.1 + node.x) > 0) ? '#10b981' : '#06b6d4';
+        ctx.fillRect(node.x + 6, height - 45 - node.height, 5, 3);
+        ctx.fillStyle = '#a855f7';
+        ctx.fillRect(node.x + 16, height - 45 - node.height, 5, 3);
+      });
+
+      // 3. Ground / Server Corridor Runway
+      ctx.fillStyle = '#111827';
+      ctx.fillRect(0, height - 48, width, 48);
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, height - 48);
+      ctx.lineTo(width, height - 48);
+      ctx.stroke();
+
+      // Runway light lines
+      const laneOffset = (runCycle * 2.5) % 40;
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)';
+      ctx.setLineDash([15, 25]);
+      ctx.lineDashOffset = -laneOffset;
+      ctx.beginPath();
+      ctx.moveTo(0, height - 24);
+      ctx.lineTo(width, height - 24);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 4. Update Jumping Physics
+      if (isJumping) {
+        runnerY += runnerVY;
+        runnerVY += 0.38; // gravity
+        if (runnerY >= runnerBaseY) {
+          runnerY = runnerBaseY;
+          isJumping = false;
+          runnerVY = 0;
+          createDustParticles(runnerX + 15, runnerBaseY + 20, '#06b6d4');
+        }
+      }
+
+      // 5. Draw Obstacle (Corrupt Bug Gateway)
+      const obsX = obstaclePos.x;
+      const obsY = height - 48 - 42;
+      ctx.fillStyle = '#ef4444';
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 10;
+      ctx.fillRect(obsX, obsY, 24, 42);
+      ctx.shadowBlur = 0;
+
+      // Bug icon or pattern
+      ctx.fillStyle = '#000';
+      ctx.font = '10px "Fira Code", monospace';
+      ctx.fillText('<!>', obsX + 3, obsY + 24);
+
+      // 6. Draw Programmer Character
+      drawProgrammerCharacter(runnerX, runnerY);
+
+      // 7. Update and Draw Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.03;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life;
+        ctx.fillRect(p.x, p.y, 3, 3);
+        ctx.globalAlpha = 1;
+      }
+
+      runCycle++;
+      runnerAnimationId = requestAnimationFrame(animateRunnerLoop);
+    }
+
+    function drawProgrammerCharacter(x, y) {
+      ctx.save();
+      const charColor = selectedCharacter.color || '#10b981';
+
+      // Slight head bob when running on ground
+      const bob = isJumping ? 0 : Math.sin(runCycle * 0.3) * 2;
+
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.beginPath();
+      ctx.ellipse(x + 14, runnerBaseY + 36, 12, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Body / Hoodie
+      ctx.fillStyle = charColor;
+      ctx.fillRect(x + 5, y + 10 + bob, 18, 18);
+
+      // Laptop in hand
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(x + 18, y + 18 + bob, 12, 7);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillRect(x + 20, y + 15 + bob, 8, 4);
+
+      // Head
+      ctx.fillStyle = '#fde047';
+      ctx.fillRect(x + 8, y + bob, 12, 11);
+
+      // Hacker Glasses / Headset
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(x + 14, y + 3 + bob, 8, 4);
+
+      // Running Legs animation
+      const legPhase = Math.sin(runCycle * 0.3);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 3;
+
+      if (isJumping) {
+        // Tucked legs
+        ctx.beginPath();
+        ctx.moveTo(x + 9, y + 28);
+        ctx.lineTo(x + 4, y + 34);
+        ctx.moveTo(x + 19, y + 28);
+        ctx.lineTo(x + 24, y + 34);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(x + 9, y + 28 + bob);
+        ctx.lineTo(x + 9 - legPhase * 8, y + 40);
+        ctx.moveTo(x + 19, y + 28 + bob);
+        ctx.lineTo(x + 19 + legPhase * 8, y + 40);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function showScreen(screenName) {
+      document.getElementById('homeScreen').classList.add('hidden');
+      document.getElementById('levelSelectScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('levelSummaryScreen').classList.add('hidden');
+
+      if (screenName === 'home') {
+        document.getElementById('homeScreen').classList.remove('hidden');
+      } else if (screenName === 'levelSelect') {
+        renderLevelSelectCards();
+        document.getElementById('levelSelectScreen').classList.remove('hidden');
+      } else if (screenName === 'game') {
+        document.getElementById('gameScreen').classList.remove('hidden');
+        resizeCanvas();
+      } else if (screenName === 'summary') {
+        document.getElementById('levelSummaryScreen').classList.remove('hidden');
+      }
+    }
+
+    function initCharacterSelector() {
+      const container = document.getElementById('characterOptions');
+      container.innerHTML = '';
+      CHARACTERS.forEach(char => {
+        const isSelected = char.id === selectedCharacter.id;
+        const btn = document.createElement('div');
+        btn.className = `p-2.5 rounded-xl border cursor-pointer transition flex flex-col items-center text-center ${
+          isSelected ? 'border-emerald-400 bg-emerald-500/10' : 'border-cyber-border bg-slate-900/60 hover:border-slate-600'
+        }`;
+        btn.onclick = () => selectCharacter(char);
+        btn.innerHTML = `
+          <div class="text-2xl mb-1">${char.symbol}</div>
+          <div class="text-[11px] font-mono font-bold text-slate-200">${char.name}</div>
+          <div class="text-[9px] text-slate-400 font-mono">${char.role}</div>
+        `;
+        container.appendChild(btn);
+      });
+    }
+
+    function selectCharacter(char) {
+      selectedCharacter = char;
+      document.getElementById('selectedCharRole').innerText = `${char.name} (${char.role})`;
+      initCharacterSelector();
+      playTone(480, 'sine', 0.05);
+    }
+
+    function renderLevelSelectCards() {
+      const container = document.getElementById('levelCardsContainer');
+      container.innerHTML = '';
+      document.getElementById('unlockedLevelsCount').innerText = `${gameState.unlockedLevels} / ${LEVELS.length}`;
+
+      LEVELS.forEach((lvl, idx) => {
+        const isUnlocked = lvl.id <= gameState.unlockedLevels;
+        const card = document.createElement('div');
+        card.className = `rounded-xl border p-4 font-mono transition flex flex-col justify-between ${
+          isUnlocked
+            ? 'border-cyber-border bg-cyber-card hover:border-emerald-500/60 hover:shadow-lg hover:shadow-emerald-950/30'
+            : 'border-slate-800 bg-slate-950/50 opacity-60'
+        }`;
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] uppercase px-2 py-0.5 rounded border ${
+                isUnlocked ? 'border-emerald-500/40 text-emerald-300 bg-emerald-950/20' : 'border-slate-700 text-slate-500'
+              }">${lvl.badge}</span>
+              <span class="text-xs text-slate-400">${isUnlocked ? '🔓 TERBUKA' : '🔒 TERKUNCI'}</span>
+            </div>
+            <h3 class="font-bold text-slate-100 text-sm mb-1">${lvl.title}</h3>
+            <p class="text-xs text-slate-400 mb-4 line-clamp-2">${lvl.desc}</p>
+          </div>
+          <div class="pt-3 border-t border-cyber-border flex items-center justify-between">
+            <span class="text-[11px] text-slate-400">${lvl.questions.length} Rintangan Bug</span>
+            <button ${isUnlocked ? `onclick="startLevel(${idx})"` : 'disabled'} class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+              isUnlocked ? 'bg-emerald-500 hover:bg-emerald-400 text-slate-950' : 'bg-slate-800 text-slate-600 cursor-not-allowed'
+            }">
+              ${isUnlocked ? 'Mulai Misi ➜' : 'Terkunci'}
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function startLevel(levelIndex) {
+      initAudio();
+      gameState.currentLevelIndex = levelIndex;
+      gameState.currentQuestionIndex = 0;
+      gameState.energy = 3;
+      gameState.hintsUsedInQuestion = 0;
+
+      showScreen('game');
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const currentLevel = LEVELS[gameState.currentLevelIndex];
+      const q = currentLevel.questions[gameState.currentQuestionIndex];
+
+      // Reset HUD
+      updateHud();
+      gameState.hintsUsedInQuestion = 0;
+      document.getElementById('hintContainer').classList.add('hidden');
+      document.getElementById('btnUseHint').disabled = false;
+      document.getElementById('btnUseHint').classList.remove('opacity-50');
+
+      // Populate Contents
+      document.getElementById('hudLevelTitle').innerText = currentLevel.title;
+      document.getElementById('hudQuestionProgress').innerText = `Rintangan ${gameState.currentQuestionIndex + 1} / ${currentLevel.questions.length}`;
+      document.getElementById('terminalFileName').innerText = `patch_seq_L${currentLevel.id}_Q${gameState.currentQuestionIndex + 1}.js`;
+      document.getElementById('questionTypeBadge').innerText = q.type.toUpperCase();
+      document.getElementById('storyContext').innerText = q.story;
+      document.getElementById('codeSnippetBox').innerHTML = `<code>${escapeHtml(q.code)}</code>`;
+      document.getElementById('currentQuestionText').innerText = q.question;
+
+      // Populate Options
+      const optionsContainer = document.getElementById('optionsContainer');
+      optionsContainer.innerHTML = '';
+      q.options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full p-3 rounded-lg border border-cyber-border bg-slate-900/80 hover:bg-emerald-950/40 hover:border-emerald-500/50 text-slate-100 font-mono text-xs sm:text-sm text-left transition flex items-center justify-between active:scale-[0.98]";
+        btn.innerHTML = `<span>${escapeHtml(opt)}</span><span class="text-slate-500 text-xs">⏎</span>`;
+        btn.onclick = () => submitAnswer(opt);
+        optionsContainer.appendChild(btn);
+      });
+
+      // Reset and Start Timer
+      startTimer();
+    }
+
+    function startTimer() {
+      clearInterval(gameState.timerInterval);
+      gameState.timer = 30;
+      const timerDisplay = document.getElementById('hudTimer');
+      timerDisplay.innerText = `${gameState.timer}s`;
+      timerDisplay.className = "text-emerald-400 font-bold font-mono text-sm";
+
+      gameState.timerInterval = setInterval(() => {
+        gameState.timer--;
+        timerDisplay.innerText = `${gameState.timer}s`;
+
+        if (gameState.timer <= 10) {
+          timerDisplay.className = "text-red-400 font-bold font-mono text-sm animate-pulse";
+          if (gameState.timer <= 5 && gameState.timer > 0) {
+            playTone(280, 'sine', 0.05, 0.08);
+          }
+        }
+
+        if (gameState.timer <= 0) {
+          clearInterval(gameState.timerInterval);
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function handleTimeout() {
+      triggerGlitchError();
+      gameState.energy--;
+      gameState.score = Math.max(0, gameState.score - 50);
+      updateHud();
+
+      showExplanationModal(
+        false,
+        "Waktu Habis!",
+        -50,
+        "Waktu 30 detik debugging habis. Energi server berkurang 1. Ingat selalu analisis pola nilai awal (a) dan selisih (b/r)."
+      );
+    }
+
+    function requestHint() {
+      initAudio();
+      const currentLevel = LEVELS[gameState.currentLevelIndex];
+      const q = currentLevel.questions[gameState.currentQuestionIndex];
+
+      if (gameState.hintsUsedInQuestion >= q.hints.length) {
+        return;
+      }
+
+      // Cost 10 score
+      gameState.score = Math.max(0, gameState.score - 10);
+      updateHud();
+      playTone(550, 'sine', 0.08);
+
+      const hintText = q.hints[gameState.hintsUsedInQuestion];
+      gameState.hintsUsedInQuestion++;
+
+      const hintContainer = document.getElementById('hintContainer');
+      hintContainer.classList.remove('hidden');
+      document.getElementById('hintLevelText').innerText = `HINT TAHAP ${gameState.hintsUsedInQuestion} / ${q.hints.length}`;
+      document.getElementById('hintContentText').innerText = hintText;
+
+      if (gameState.hintsUsedInQuestion >= q.hints.length) {
+        document.getElementById('btnUseHint').disabled = true;
+        document.getElementById('btnUseHint').classList.add('opacity-50');
+      }
+    }
+
+    function submitAnswer(chosenOption) {
+      clearInterval(gameState.timerInterval);
+      initAudio();
+      const currentLevel = LEVELS[gameState.currentLevelIndex];
+      const q = currentLevel.questions[gameState.currentQuestionIndex];
+
+      const isCorrect = chosenOption === q.answer;
+
+      if (isCorrect) {
+        triggerJumpSuccess();
+        soundSuccess();
+
+        // Calculate points
+        let pointsGained = 100;
+        if (gameState.hintsUsedInQuestion === 0) pointsGained += 50; // No hint bonus
+        if (gameState.timer > 15) pointsGained += 25; // Speed bonus
+
+        gameState.score += pointsGained;
+        updateHud();
+
+        showExplanationModal(
+          true,
+          "Jawaban Tepat! Kode Valid!",
+          pointsGained,
+          q.explanation
+        );
+      } else {
+        triggerGlitchError();
+        gameState.energy--;
+        gameState.score = Math.max(0, gameState.score - 25);
+        updateHud();
+
+        showExplanationModal(
+          false,
+          "Kode Masih Mengalami Bug!",
+          -25,
+          `Pilihanmu: ${chosenOption}. Jawaban yang tepat adalah: <b>${q.answer}</b>.<br><br>${q.explanation}`
+        );
+      }
+    }
+
+    function updateHud() {
+      document.getElementById('hudScore').innerText = gameState.score;
+      let heartStr = '';
+      for (let i = 0; i < 3; i++) {
+        heartStr += (i < gameState.energy) ? '❤️' : '🖤';
+      }
+      document.getElementById('hudHearts').innerText = heartStr;
+    }
+
+    function showExplanationModal(isCorrect, title, deltaScore, explanationHtml) {
+      const modal = document.getElementById('explanationModal');
+      const titleElem = document.getElementById('modalFeedbackTitle');
+      const deltaElem = document.getElementById('modalPoinDelta');
+
+      titleElem.innerHTML = isCorrect ? `<span>✅</span> ${title}` : `<span>❌</span> ${title}`;
+      titleElem.className = isCorrect ? 'font-bold text-base text-emerald-400 flex items-center gap-2' : 'font-bold text-base text-red-400 flex items-center gap-2';
+
+      deltaElem.innerText = deltaScore >= 0 ? `+${deltaScore} Poin` : `${deltaScore} Poin`;
+      deltaElem.className = deltaScore >= 0 ? 'text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold' : 'text-xs px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-bold';
+
+      document.getElementById('modalExplanationContent').innerHTML = explanationHtml;
+
+      const nextBtn = document.getElementById('btnModalNextStep');
+      if (gameState.energy <= 0) {
+        nextBtn.innerText = 'Energi Habis: Ulangi Level 🔄';
+        nextBtn.className = 'px-5 py-2.5 rounded-lg bg-red-500 hover:bg-red-400 text-white font-bold text-xs transition';
+      } else {
+        nextBtn.innerText = 'Lanjutkan Lari ➜';
+        nextBtn.className = 'px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition';
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function proceedToNextObstacle() {
+      document.getElementById('explanationModal').classList.add('hidden');
+
+      if (gameState.energy <= 0) {
+        // Restart current level
+        startLevel(gameState.currentLevelIndex);
+        return;
+      }
+
+      const currentLevel = LEVELS[gameState.currentLevelIndex];
+      gameState.currentQuestionIndex++;
+
+      if (gameState.currentQuestionIndex < currentLevel.questions.length) {
+        loadQuestion();
+      } else {
+        // Level cleared!
+        soundLevelClear();
+        gameState.score += 200; // Level completion bonus
+        if (gameState.currentLevelIndex + 1 > gameState.unlockedLevels) {
+          gameState.unlockedLevels = Math.min(LEVELS.length, gameState.currentLevelIndex + 2);
+        }
+        if (gameState.score > gameState.topScore) {
+          gameState.topScore = gameState.score;
+          document.getElementById('topScoreValue').innerText = `${gameState.topScore.toLocaleString()} Pts`;
+          document.getElementById('topPlayerRole').innerText = selectedCharacter.name;
+        }
+
+        showLevelSummary();
+      }
+    }
+
+    function showLevelSummary() {
+      const currentLevel = LEVELS[gameState.currentLevelIndex];
+      document.getElementById('summaryStatusTitle').innerText = `${currentLevel.title.toUpperCase()} SELESAI!`;
+      document.getElementById('summarySubtitle').innerText = "Semua pola barisan telah diperbaiki dan server kembali berjalan optimal.";
+      document.getElementById('summaryLevelScore').innerText = `+${200 + (gameState.energy * 25)}`;
+      document.getElementById('summaryEnergyRemain').innerText = `${gameState.energy}/3`;
+      document.getElementById('summaryTotalScore').innerText = gameState.score;
+
+      const btnNext = document.getElementById('btnNextLevel');
+      if (gameState.currentLevelIndex + 1 < LEVELS.length) {
+        btnNext.innerText = 'Lanjut Level Berikutnya ➜';
+        btnNext.onclick = () => startLevel(gameState.currentLevelIndex + 1);
+        btnNext.classList.remove('hidden');
+      } else {
+        btnNext.innerText = '🎉 Tamat! Kembali ke Menu';
+        btnNext.onclick = () => showScreen('home');
+      }
+
+      showScreen('summary');
+    }
+
+    function nextLevelOrSelect() {
+      if (gameState.currentLevelIndex + 1 < LEVELS.length) {
+        startLevel(gameState.currentLevelIndex + 1);
+      } else {
+        showScreen('levelSelect');
+      }
+    }
+
+    /* Modal helpers */
+    function openModal(id) {
+      initAudio();
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    window.onload = function() {
+      initCharacterSelector();
+      initServerEnvironment();
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      // Start runner canvas animation
+      animateRunnerLoop();
+    };
+  </script>
+</body>
+</html>
