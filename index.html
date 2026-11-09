@@ -947,6 +947,20 @@ for (let n = 1; n <= 5; n++) {
     let particles = [];
     let serverNodes = [];
     let obstaclePos = { x: 420, active: true, label: 'BUG: firewall' };
+    // Keadaan gerak rintangan: approaching (mendekat dari kanan) -> waiting
+    // (berhenti di depan karakter) -> passing (melintas di bawah karakter
+    // saat jawaban benar) / hitting -> hit (menabrak saat salah/timeout)
+    // -> cleared (sudah lewat, tidak digambar sampai soal berikutnya).
+    let obstacleState = 'approaching';
+    let obstaclePassSpeed = 5;
+    let obstacleHitSpeed = 5;
+    const OBSTACLE_SPEED = 2.5; // sama dengan gerak garis lintasan
+
+    function spawnObstacle() {
+      const rect = canvas.getBoundingClientRect();
+      obstaclePos.x = Math.max(rect.width - 40, runnerX + 200);
+      obstacleState = 'approaching';
+    }
 
     function resizeCanvas() {
       const rect = canvas.getBoundingClientRect();
@@ -955,7 +969,6 @@ for (let n = 1; n <= 5; n++) {
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
       runnerBaseY = rect.height - 48;
       runnerY = runnerBaseY;
-      obstaclePos.x = rect.width * 0.72;
     }
 
     // Populate futuristic server racks in background
@@ -989,12 +1002,19 @@ for (let n = 1; n <= 5; n++) {
       soundJump();
       isJumping = true;
       runnerVY = -7.5;
+      // Rintangan melintas di bawah karakter selama lompatan (~35 frame),
+      // kecepatannya menyesuaikan jarak rintangan saat ini.
+      obstacleState = 'passing';
+      obstaclePassSpeed = Math.max(5, (obstaclePos.x - (runnerX - 30)) / 35);
       showCanvasToast('JUMP OVER BUG // VALIDATED!', '#10b981');
       createDustParticles(runnerX + 15, runnerY + 25, '#10b981');
     }
 
     function triggerGlitchError() {
       soundError();
+      // Rintangan menabrak karakter: meluncur sampai tepat di depannya.
+      obstacleState = 'hitting';
+      obstacleHitSpeed = Math.max(5, (obstaclePos.x - (runnerX + 26)) / 20);
       showCanvasToast('RUNTIME ERROR // ENERGY -1', '#ef4444');
       createDustParticles(runnerX + 15, runnerY + 10, '#ef4444');
       // subtle screen shake effect
@@ -1082,19 +1102,43 @@ for (let n = 1; n <= 5; n++) {
         }
       }
 
-      // 5. Draw Obstacle (Corrupt Bug Gateway)
+      // 5. Update & Draw Obstacle (Corrupt Bug Gateway)
+      // Rintangan ikut bergerak mendekat seperti latarnya, lalu berhenti
+      // di depan karakter sampai soal dijawab.
+      const holdX = runnerX + 44;
+      if (obstacleState === 'approaching') {
+        obstaclePos.x -= OBSTACLE_SPEED;
+        if (obstaclePos.x <= holdX) {
+          obstaclePos.x = holdX;
+          obstacleState = 'waiting';
+        }
+      } else if (obstacleState === 'passing') {
+        obstaclePos.x -= obstaclePassSpeed;
+        if (obstaclePos.x < -30) {
+          obstacleState = 'cleared';
+        }
+      } else if (obstacleState === 'hitting') {
+        obstaclePos.x -= obstacleHitSpeed;
+        if (obstaclePos.x <= runnerX + 26) {
+          obstaclePos.x = runnerX + 26;
+          obstacleState = 'hit';
+        }
+      }
+
       const obsX = obstaclePos.x;
       const obsY = height - 48 - 42;
-      ctx.fillStyle = '#ef4444';
-      ctx.shadowColor = '#ef4444';
-      ctx.shadowBlur = 10;
-      ctx.fillRect(obsX, obsY, 24, 42);
-      ctx.shadowBlur = 0;
+      if (obstacleState !== 'cleared') {
+        ctx.fillStyle = '#ef4444';
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 10;
+        ctx.fillRect(obsX, obsY, 24, 42);
+        ctx.shadowBlur = 0;
 
-      // Bug icon or pattern
-      ctx.fillStyle = '#000';
-      ctx.font = '10px "Fira Code", monospace';
-      ctx.fillText('<!>', obsX + 3, obsY + 24);
+        // Bug icon or pattern
+        ctx.fillStyle = '#000';
+        ctx.font = '10px "Fira Code", monospace';
+        ctx.fillText('<!>', obsX + 3, obsY + 24);
+      }
 
       // 6. Draw Programmer Character
       drawProgrammerCharacter(runnerX, runnerY);
@@ -1301,6 +1345,9 @@ for (let n = 1; n <= 5; n++) {
         btn.onclick = () => submitAnswer(opt);
         optionsContainer.appendChild(btn);
       });
+
+      // Rintangan baru untuk soal ini, muncul dari sisi kanan
+      spawnObstacle();
 
       // Reset and Start Timer
       startTimer();
