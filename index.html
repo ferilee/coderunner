@@ -56,8 +56,9 @@
     .glow-cyan {
       box-shadow: 0 0 15px rgba(6, 182, 212, 0.35);
     }
-    /* KaTeX di modal Materi: warna mengikuti kotak rumusnya, ukuran sedikit lebih besar agar terbaca */
-    #materiModal .katex {
+    /* KaTeX di modal Materi & tag beranda: warna mengikuti teks sekitarnya, ukuran sedikit lebih besar agar terbaca */
+    #materiModal .katex,
+    #homeScreen .katex {
       font-size: 1.08em;
       color: inherit;
     }
@@ -293,7 +294,7 @@
 
           <!-- Help Info Footer -->
           <div class="mt-4 pt-3 border-t border-cyber-border flex items-center justify-between text-[11px] font-mono text-slate-400">
-            <span>Benar: <b class="text-emerald-400">+100 Poin</b></span>
+            <span>Benar: <b class="text-emerald-400">+100–175 Poin</b> (dengan bonus)</span>
             <span>Salah: <b class="text-red-400">-1 Energi</b></span>
           </div>
         </div>
@@ -447,7 +448,7 @@ for (let n = 1; n <= 5; n++) {
         </li>
         <li class="flex items-start gap-2">
           <span class="text-emerald-400 font-bold">3.</span>
-          <span><b>Skor & Lompatan:</b> Jawaban benar (+100 poin) membuat karakter melompati rintangan. Cepat menjawab sebelum timer habis memberi bonus +25 poin!</span>
+          <span><b>Skor & Lompatan:</b> Jawaban benar (+100 poin) membuat karakter melompati rintangan. Ada bonus +50 poin bila menjawab tanpa hint, dan bonus +25 poin bila menjawab cepat (sisa waktu lebih dari 15 detik)!</span>
         </li>
         <li class="flex items-start gap-2">
           <span class="text-red-400 font-bold">4.</span>
@@ -864,6 +865,7 @@ for (let n = 1; n <= 5; n++) {
       hintsUsedInQuestion: 0,
       unlockedLevels: 1,
       isPaused: false,
+      isAnswerRevealed: false,
       topScore: 1250,
       topPlayer: 'Cybersecurity Specialist'
     };
@@ -1321,6 +1323,7 @@ for (let n = 1; n <= 5; n++) {
 
       // Reset HUD
       updateHud();
+      gameState.isAnswerRevealed = false;
       gameState.hintsUsedInQuestion = 0;
       document.getElementById('hintContainer').classList.add('hidden');
       document.getElementById('btnUseHint').disabled = false;
@@ -1361,6 +1364,12 @@ for (let n = 1; n <= 5; n++) {
       timerDisplay.className = "text-emerald-400 font-bold font-mono text-sm";
 
       gameState.timerInterval = setInterval(() => {
+        // Selama modal (Materi/Petunjuk/Rekor) terbuka, hitung mundur
+        // berhenti agar murid bisa membaca tanpa kehilangan waktu.
+        if (gameState.isPaused) {
+          timerDisplay.innerText = `${gameState.timer}s ⏸`;
+          return;
+        }
         gameState.timer--;
         timerDisplay.innerText = `${gameState.timer}s`;
 
@@ -1379,12 +1388,14 @@ for (let n = 1; n <= 5; n++) {
     }
 
     function handleTimeout() {
+      if (gameState.isAnswerRevealed) return;
+      gameState.isAnswerRevealed = true;
       triggerGlitchError();
       gameState.energy--;
       gameState.score = Math.max(0, gameState.score - 50);
       updateHud();
 
-      showExplanationModal(
+      showExplanationModalDelayed(
         false,
         "Waktu Habis!",
         -50,
@@ -1393,6 +1404,7 @@ for (let n = 1; n <= 5; n++) {
     }
 
     function requestHint() {
+      if (gameState.isAnswerRevealed) return;
       initAudio();
       const currentLevel = LEVELS[gameState.currentLevelIndex];
       const q = currentLevel.questions[gameState.currentQuestionIndex];
@@ -1420,7 +1432,19 @@ for (let n = 1; n <= 5; n++) {
       }
     }
 
+    // Modal pembahasan ditunda sebentar agar animasi lompatan/tabakan
+    // di canvas sempat terlihat sebelum tertutup modal.
+    const EXPLANATION_DELAY_MS = 700;
+
+    function showExplanationModalDelayed(isCorrect, title, deltaScore, explanationHtml) {
+      setTimeout(() => {
+        showExplanationModal(isCorrect, title, deltaScore, explanationHtml);
+      }, EXPLANATION_DELAY_MS);
+    }
+
     function submitAnswer(chosenOption) {
+      if (gameState.isAnswerRevealed) return;
+      gameState.isAnswerRevealed = true;
       clearInterval(gameState.timerInterval);
       initAudio();
       const currentLevel = LEVELS[gameState.currentLevelIndex];
@@ -1432,19 +1456,25 @@ for (let n = 1; n <= 5; n++) {
         triggerJumpSuccess();
         soundSuccess();
 
-        // Calculate points
-        let pointsGained = 100;
-        if (gameState.hintsUsedInQuestion === 0) pointsGained += 50; // No hint bonus
-        if (gameState.timer > 15) pointsGained += 25; // Speed bonus
+        // Calculate points, with an explicit breakdown for the modal
+        const basePoints = 100;
+        const noHintBonus = gameState.hintsUsedInQuestion === 0 ? 50 : 0;
+        const speedBonus = gameState.timer > 15 ? 25 : 0;
+        const pointsGained = basePoints + noHintBonus + speedBonus;
 
         gameState.score += pointsGained;
         updateHud();
 
-        showExplanationModal(
+        let breakdown = `Rincian poin: dasar ${basePoints}`;
+        if (noHintBonus > 0) breakdown += ` + bonus tanpa hint ${noHintBonus}`;
+        if (speedBonus > 0) breakdown += ` + bonus cepat ${speedBonus}`;
+        breakdown += ` = ${pointsGained}.`;
+
+        showExplanationModalDelayed(
           true,
           "Jawaban Tepat! Kode Valid!",
           pointsGained,
-          q.explanation
+          `${q.explanation}<br><br>${breakdown}`
         );
       } else {
         triggerGlitchError();
@@ -1452,7 +1482,7 @@ for (let n = 1; n <= 5; n++) {
         gameState.score = Math.max(0, gameState.score - 25);
         updateHud();
 
-        showExplanationModal(
+        showExplanationModalDelayed(
           false,
           "Kode Masih Mengalami Bug!",
           -25,
@@ -1565,10 +1595,12 @@ for (let n = 1; n <= 5; n++) {
     /* Modal helpers */
     function openModal(id) {
       initAudio();
+      gameState.isPaused = true;
       document.getElementById(id).classList.remove('hidden');
     }
 
     function closeModal(id) {
+      gameState.isPaused = false;
       document.getElementById(id).classList.add('hidden');
     }
 
@@ -1582,14 +1614,16 @@ for (let n = 1; n <= 5; n++) {
       document.getElementById('topPlayerRole').innerText = gameState.topPlayer;
       document.getElementById('selectedCharRole').innerText = selectedCharacter.name;
       initCharacterSelector();
-      // Render rumus LaTeX -> KaTeX, khusus di modal Materi saja
+      // Render rumus LaTeX -> KaTeX di modal Materi dan tag konsep beranda
       if (window.renderMathInElement) {
-        renderMathInElement(document.getElementById('materiModal'), {
-          delimiters: [
-            { left: '$$', right: '$$', display: true },
-            { left: '$', right: '$', display: false }
-          ],
-          throwOnError: false
+        ['materiModal', 'homeScreen'].forEach((id) => {
+          renderMathInElement(document.getElementById(id), {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$', right: '$', display: false }
+            ],
+            throwOnError: false
+          });
         });
       }
       initServerEnvironment();
