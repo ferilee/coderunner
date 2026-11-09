@@ -136,6 +136,10 @@
         </button>
       </div>
 
+      <button onclick="resetProgress()" class="mt-4 text-[11px] font-mono text-slate-500 hover:text-red-400 underline underline-offset-2 transition">
+        🗑️ Reset progres tersimpan di perangkat ini
+      </button>
+
       <!-- Quick Concept Tags -->
       <div class="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl w-full text-xs font-mono text-slate-400">
         <div class="p-3 rounded-lg border border-cyber-border/70 bg-slate-900/60">
@@ -844,14 +848,82 @@ for (let n = 1; n <= 5; n++) {
       currentLevelIndex: 0,
       currentQuestionIndex: 0,
       score: 0,
+      levelStartScore: 0,
       energy: 3,
       timer: 30,
       timerInterval: null,
       hintsUsedInQuestion: 0,
       unlockedLevels: 1,
       isPaused: false,
-      topScore: 750
+      topScore: 1250,
+      topPlayer: 'Cybersecurity Specialist'
     };
+
+    /* Simpan progres di perangkat ini (localStorage):
+       level terbuka, skor total, rekor, dan karakter terpilih. */
+    const SAVE_KEY = 'coderunner_progress_v1';
+
+    function saveProgress() {
+      try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify({
+          unlockedLevels: gameState.unlockedLevels,
+          score: gameState.score,
+          topScore: gameState.topScore,
+          topPlayer: gameState.topPlayer,
+          selectedCharacterId: selectedCharacter.id
+        }));
+      } catch (e) {
+        console.debug('Simpan progres tidak tersedia:', e);
+      }
+    }
+
+    function loadProgress() {
+      try {
+        const raw = localStorage.getItem(SAVE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (Number.isInteger(data.unlockedLevels)) {
+          gameState.unlockedLevels = Math.min(LEVELS.length, Math.max(1, data.unlockedLevels));
+        }
+        if (Number.isFinite(data.score) && data.score >= 0) {
+          gameState.score = data.score;
+        }
+        if (Number.isFinite(data.topScore) && data.topScore >= 0) {
+          gameState.topScore = data.topScore;
+        }
+        if (typeof data.topPlayer === 'string' && data.topPlayer) {
+          gameState.topPlayer = data.topPlayer;
+        }
+        const savedChar = CHARACTERS.find(c => c.id === data.selectedCharacterId);
+        if (savedChar) {
+          selectedCharacter = savedChar;
+        }
+      } catch (e) {
+        console.debug('Muat progres gagal, memakai progres baru:', e);
+      }
+    }
+
+    function resetProgress() {
+      if (!confirm('Hapus progres tersimpan di perangkat ini? Skor, level terbuka, dan rekor akan kembali ke awal.')) {
+        return;
+      }
+      try {
+        localStorage.removeItem(SAVE_KEY);
+      } catch (e) {
+        console.debug('Hapus progres tidak tersedia:', e);
+      }
+      gameState.unlockedLevels = 1;
+      gameState.score = 0;
+      gameState.levelStartScore = 0;
+      gameState.topScore = 1250;
+      gameState.topPlayer = 'Cybersecurity Specialist';
+      selectedCharacter = CHARACTERS[0];
+      document.getElementById('topScoreValue').innerText = `${gameState.topScore.toLocaleString()} Pts`;
+      document.getElementById('topPlayerRole').innerText = gameState.topPlayer;
+      document.getElementById('selectedCharRole').innerText = selectedCharacter.name;
+      initCharacterSelector();
+      showScreen('home');
+    }
 
     const canvas = document.getElementById('runnerCanvas');
     const ctx = canvas.getContext('2d');
@@ -1136,6 +1208,7 @@ for (let n = 1; n <= 5; n++) {
       selectedCharacter = char;
       document.getElementById('selectedCharRole').innerText = `${char.name} (${char.role})`;
       initCharacterSelector();
+      saveProgress();
       playTone(480, 'sine', 0.05);
     }
 
@@ -1181,6 +1254,7 @@ for (let n = 1; n <= 5; n++) {
       initAudio();
       gameState.currentLevelIndex = levelIndex;
       gameState.currentQuestionIndex = 0;
+      gameState.levelStartScore = gameState.score;
       gameState.energy = 3;
       gameState.hintsUsedInQuestion = 0;
 
@@ -1333,6 +1407,7 @@ for (let n = 1; n <= 5; n++) {
 
     function updateHud() {
       document.getElementById('hudScore').innerText = gameState.score;
+      saveProgress();
       let heartStr = '';
       for (let i = 0; i < 3; i++) {
         heartStr += (i < gameState.energy) ? '❤️' : '🖤';
@@ -1383,14 +1458,19 @@ for (let n = 1; n <= 5; n++) {
         // Level cleared!
         soundLevelClear();
         gameState.score += 200; // Level completion bonus
-        if (gameState.currentLevelIndex + 1 > gameState.unlockedLevels) {
-          gameState.unlockedLevels = Math.min(LEVELS.length, gameState.currentLevelIndex + 2);
-        }
+        // Buka level berikutnya: id level berikutnya = indeks level saat ini + 2.
+        // Math.max menjaga level yang sudah terbuka tidak terkunci lagi.
+        gameState.unlockedLevels = Math.max(
+          gameState.unlockedLevels,
+          Math.min(LEVELS.length, gameState.currentLevelIndex + 2)
+        );
         if (gameState.score > gameState.topScore) {
           gameState.topScore = gameState.score;
+          gameState.topPlayer = selectedCharacter.name;
           document.getElementById('topScoreValue').innerText = `${gameState.topScore.toLocaleString()} Pts`;
-          document.getElementById('topPlayerRole').innerText = selectedCharacter.name;
+          document.getElementById('topPlayerRole').innerText = gameState.topPlayer;
         }
+        saveProgress();
 
         showLevelSummary();
       }
@@ -1400,7 +1480,8 @@ for (let n = 1; n <= 5; n++) {
       const currentLevel = LEVELS[gameState.currentLevelIndex];
       document.getElementById('summaryStatusTitle').innerText = `${currentLevel.title.toUpperCase()} SELESAI!`;
       document.getElementById('summarySubtitle').innerText = "Semua pola barisan telah diperbaiki dan server kembali berjalan optimal.";
-      document.getElementById('summaryLevelScore').innerText = `+${200 + (gameState.energy * 25)}`;
+      const levelScoreGained = gameState.score - gameState.levelStartScore;
+      document.getElementById('summaryLevelScore').innerText = `${levelScoreGained >= 0 ? '+' : ''}${levelScoreGained}`;
       document.getElementById('summaryEnergyRemain').innerText = `${gameState.energy}/3`;
       document.getElementById('summaryTotalScore').innerText = gameState.score;
 
@@ -1440,6 +1521,10 @@ for (let n = 1; n <= 5; n++) {
     }
 
     window.onload = function() {
+      loadProgress();
+      document.getElementById('topScoreValue').innerText = `${gameState.topScore.toLocaleString()} Pts`;
+      document.getElementById('topPlayerRole').innerText = gameState.topPlayer;
+      document.getElementById('selectedCharRole').innerText = selectedCharacter.name;
       initCharacterSelector();
       initServerEnvironment();
       resizeCanvas();
