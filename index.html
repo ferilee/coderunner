@@ -76,9 +76,89 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: #374151;
     }
+
+    /* ===== Mode Proyektor (tema terang) =====
+       Tema gelap tetap bawaan. Kelas .proyektor di <body> membalik
+       permukaan gelap menjadi terang dan menggelapkan teks aksen
+       agar kontrasnya cukup untuk proyektor di ruangan terang.
+       Logika, soal, dan skor tidak terpengaruh sama sekali. */
+    body.proyektor { background-color: #edf1f6; }
+    body.proyektor .bg-cyber-dark { background-color: #edf1f6; }
+    body.proyektor .bg-cyber-card { background-color: #ffffff; }
+    body.proyektor .bg-cyber-card\/80 { background-color: rgba(255, 255, 255, 0.88); }
+    body.proyektor .bg-slate-900 { background-color: #e8eef5; }
+    body.proyektor .bg-slate-900\/60 { background-color: rgba(232, 238, 245, 0.92); }
+    body.proyektor .bg-slate-900\/80 { background-color: rgba(232, 238, 245, 0.95); }
+    body.proyektor .bg-slate-900\/90 { background-color: rgba(232, 238, 245, 0.97); }
+    body.proyektor .bg-slate-800 { background-color: #f1f5f9; }
+    body.proyektor .bg-slate-800\/80 { background-color: rgba(241, 245, 249, 0.92); }
+    body.proyektor .bg-slate-700 { background-color: #e2e8f0; }
+    body.proyektor .bg-slate-700\/80 { background-color: rgba(226, 232, 240, 0.92); }
+    body.proyektor .bg-slate-950\/50 { background-color: rgba(226, 232, 240, 0.65); }
+    body.proyektor .bg-\[\#05070d\] { background-color: #dcebfb; }
+    body.proyektor .bg-emerald-950\/40 { background-color: #ecfdf5; }
+    body.proyektor .bg-emerald-950\/20 { background-color: #f0fdf4; }
+    body.proyektor .bg-amber-950\/20 { background-color: #fffbeb; }
+    body.proyektor .bg-cyan-950\/30 { background-color: #ecfeff; }
+    body.proyektor .bg-cyan-900\/50 { background-color: #a5f3fc; }
+    body.proyektor .bg-purple-950\/30 { background-color: #faf5ff; }
+    body.proyektor .bg-purple-900\/50 { background-color: #e9d5ff; }
+    body.proyektor .hover\:bg-slate-700:hover { background-color: #e2e8f0; }
+    body.proyektor .hover\:bg-slate-700\/80:hover { background-color: rgba(226, 232, 240, 0.92); }
+    body.proyektor .hover\:bg-cyan-900\/50:hover { background-color: #a5f3fc; }
+    body.proyektor .hover\:bg-emerald-950\/40:hover { background-color: rgba(5, 150, 105, 0.12); }
+    body.proyektor .hover\:bg-purple-900\/50:hover { background-color: #e9d5ff; }
+    body.proyektor .text-slate-100 { color: #0f172a; }
+    body.proyektor .text-slate-200 { color: #1e293b; }
+    body.proyektor .text-slate-300 { color: #334155; }
+    body.proyektor .text-slate-400 { color: #475569; }
+    body.proyektor .text-slate-500 { color: #64748b; }
+    body.proyektor .text-slate-600 { color: #334155; }
+    body.proyektor .text-emerald-400 { color: #059669; }
+    body.proyektor .text-emerald-300 { color: #047857; }
+    body.proyektor .text-emerald-200 { color: #065f46; }
+    body.proyektor .text-cyan-400 { color: #0891b2; }
+    body.proyektor .text-cyan-300 { color: #0e7490; }
+    body.proyektor .text-cyan-200 { color: #155e75; }
+    body.proyektor .text-amber-400 { color: #d97706; }
+    body.proyektor .text-amber-400\/80 { color: rgba(217, 119, 6, 0.9); }
+    body.proyektor .text-amber-300 { color: #b45309; }
+    body.proyektor .text-amber-200 { color: #92400e; }
+    body.proyektor .text-red-400 { color: #dc2626; }
+    body.proyektor .text-red-300 { color: #b91c1c; }
+    body.proyektor .text-purple-400 { color: #9333ea; }
+    body.proyektor .text-purple-300 { color: #7e22ce; }
+    body.proyektor .text-purple-200 { color: #6b21a8; }
+    body.proyektor .border-cyber-border { border-color: #c3cfdd; }
+    body.proyektor .border-cyber-border\/70 { border-color: rgba(148, 163, 184, 0.65); }
+    body.proyektor .border-slate-800 { border-color: #cbd5e1; }
+    body.proyektor .border-slate-700 { border-color: #cbd5e1; }
+    body.proyektor .border-slate-600 { border-color: #94a3b8; }
+    body.proyektor .hover\:border-slate-600:hover { border-color: #94a3b8; }
+    body.proyektor .from-emerald-400 {
+      --tw-gradient-from: #059669 var(--tw-gradient-from-position);
+      --tw-gradient-to: rgba(5, 150, 105, 0) var(--tw-gradient-to-position);
+      --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+    }
+    body.proyektor .via-cyan-300 {
+      --tw-gradient-to: rgba(2, 132, 199, 0) var(--tw-gradient-to-position);
+      --tw-gradient-stops: var(--tw-gradient-from), #0284c7 var(--tw-gradient-via-position), var(--tw-gradient-to);
+    }
+    body.proyektor .to-indigo-400 { --tw-gradient-to: #4f46e5 var(--tw-gradient-to-position); }
+    body.proyektor .custom-scrollbar::-webkit-scrollbar-track { background: #e2e8f0; }
+    body.proyektor .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8; }
+    body.proyektor .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
   </style>
 </head>
 <body class="bg-cyber-dark text-slate-100 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-emerald-500 selection:text-black">
+  <script>
+    // Terapkan Mode Proyektor (tema terang) tersimpan sedini mungkin,
+    // sebelum halaman sempat tampil gelap.
+    try {
+      var __savedTheme = JSON.parse(localStorage.getItem('coderunner_progress_v1') || '{}').theme;
+      if (__savedTheme === 'light') document.body.classList.add('proyektor');
+    } catch (e) { /* abaikan: tema bawaan gelap */ }
+  </script>
   <header class="border-b border-cyber-border bg-cyber-card/80 backdrop-blur-md sticky top-0 z-40 px-4 py-3">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-3 cursor-pointer" onclick="showScreen('home')">
@@ -96,6 +176,9 @@
       <div class="flex items-center gap-2 sm:gap-3">
         <button id="soundToggleBtn" onclick="toggleAudio()" class="px-3 py-1.5 rounded-lg border border-cyber-border bg-slate-800/80 hover:bg-slate-700 text-xs font-mono flex items-center gap-1.5 transition">
           <span id="soundIcon">🔊</span> <span class="hidden sm:inline" id="soundText">Audio: ON</span>
+        </button>
+        <button id="themeToggleBtn" onclick="toggleProjectorMode()" title="Tema terang untuk tampilan proyektor" class="px-3 py-1.5 rounded-lg border border-cyber-border bg-slate-800/80 hover:bg-slate-700 text-xs font-mono flex items-center gap-1.5 transition">
+          <span id="themeIcon">☀️</span> <span class="hidden sm:inline" id="themeText">Proyektor: OFF</span>
         </button>
         <button onclick="openModal('materiModal')" class="px-3 py-1.5 rounded-lg border border-cyan-500/40 bg-cyan-950/30 hover:bg-cyan-900/50 text-cyan-300 text-xs font-mono transition flex items-center gap-1">
           <span>📖</span> <span class="hidden sm:inline">Materi Rumus</span>
@@ -457,6 +540,10 @@ for (let n = 1; n <= 5; n++) {
         <li class="flex items-start gap-2">
           <span class="text-amber-400 font-bold">5.</span>
           <span><b>Fitur Hint:</b> Jika ragu, klik bantuan hint bertahap (Identifikasi pola → Rumus → Perhitungan). Menggunakan hint memotong -10 poin.</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-cyan-400 font-bold">6.</span>
+          <span><b>Mode Proyektor:</b> Ditampilkan lewat proyektor di ruangan terang? Aktifkan tombol <b>Proyektor</b> di bilah atas untuk tema terang berkontras tinggi. Tema gelap tetap tampilan bawaan.</span>
         </li>
       </ul>
 
@@ -874,6 +961,24 @@ for (let n = 1; n <= 5; n++) {
        level terbuka, skor total, rekor, dan karakter terpilih. */
     const SAVE_KEY = 'coderunner_progress_v1';
 
+    /* Mode Proyektor (tema terang): tema gelap tetap bawaan.
+       Pilihan tema disimpan bersama progres di perangkat ini. */
+    let projectorMode = document.body.classList.contains('proyektor');
+
+    function applyTheme() {
+      document.body.classList.toggle('proyektor', projectorMode);
+      const icon = document.getElementById('themeIcon');
+      const text = document.getElementById('themeText');
+      if (icon) icon.innerText = projectorMode ? '🌙' : '☀️';
+      if (text) text.innerText = projectorMode ? 'Proyektor: ON' : 'Proyektor: OFF';
+    }
+
+    function toggleProjectorMode() {
+      projectorMode = !projectorMode;
+      applyTheme();
+      saveProgress();
+    }
+
     function saveProgress() {
       try {
         localStorage.setItem(SAVE_KEY, JSON.stringify({
@@ -881,7 +986,8 @@ for (let n = 1; n <= 5; n++) {
           score: gameState.score,
           topScore: gameState.topScore,
           topPlayer: gameState.topPlayer,
-          selectedCharacterId: selectedCharacter.id
+          selectedCharacterId: selectedCharacter.id,
+          theme: projectorMode ? 'light' : 'dark'
         }));
       } catch (e) {
         console.debug('Simpan progres tidak tersedia:', e);
@@ -908,6 +1014,10 @@ for (let n = 1; n <= 5; n++) {
         const savedChar = CHARACTERS.find(c => c.id === data.selectedCharacterId);
         if (savedChar) {
           selectedCharacter = savedChar;
+        }
+        if (data.theme === 'light' || data.theme === 'dark') {
+          projectorMode = data.theme === 'light';
+          applyTheme();
         }
       } catch (e) {
         console.debug('Muat progres gagal, memakai progres baru:', e);
@@ -1037,15 +1147,44 @@ for (let n = 1; n <= 5; n++) {
       }, 1400);
     }
 
+    /* Palet panggung canvas per tema: gelap bawaan, terang untuk
+       Mode Proyektor. Elemen aksen (LED, rintangan, karakter) sama
+       di kedua tema; yang berubah hanya latar, gedung, dan tanah. */
+    const CANVAS_PALETTES = {
+      dark: {
+        grid: 'rgba(31, 41, 61, 0.4)',
+        nodeFill: '#0f172a',
+        nodeStroke: '#1e293b',
+        ground: '#111827',
+        groundLine: '#10b981',
+        lane: 'rgba(16, 185, 129, 0.3)',
+        shadow: 'rgba(0,0,0,0.4)'
+      },
+      light: {
+        grid: 'rgba(100, 116, 139, 0.35)',
+        nodeFill: '#b6c6da',
+        nodeStroke: '#7d93b2',
+        ground: '#cbd5e1',
+        groundLine: '#059669',
+        lane: 'rgba(5, 150, 105, 0.45)',
+        shadow: 'rgba(15,23,42,0.22)'
+      }
+    };
+
+    function canvasPalette() {
+      return document.body.classList.contains('proyektor') ? CANVAS_PALETTES.light : CANVAS_PALETTES.dark;
+    }
+
     let runCycle = 0;
     function animateRunnerLoop() {
       const width = canvas.getBoundingClientRect().width;
       const height = canvas.getBoundingClientRect().height;
+      const pal = canvasPalette();
 
       ctx.clearRect(0, 0, width, height);
 
       // 1. Draw Tech Background Grid
-      ctx.strokeStyle = 'rgba(31, 41, 61, 0.4)';
+      ctx.strokeStyle = pal.grid;
       ctx.lineWidth = 1;
       for (let x = 0; x < width; x += 30) {
         ctx.beginPath();
@@ -1059,9 +1198,9 @@ for (let n = 1; n <= 5; n++) {
         node.x -= node.speed;
         if (node.x < -60) node.x = width + 20;
 
-        ctx.fillStyle = '#0f172a';
+        ctx.fillStyle = pal.nodeFill;
         ctx.fillRect(node.x, height - 48 - node.height, 35, node.height);
-        ctx.strokeStyle = '#1e293b';
+        ctx.strokeStyle = pal.nodeStroke;
         ctx.strokeRect(node.x, height - 48 - node.height, 35, node.height);
 
         // Blinking LED
@@ -1072,9 +1211,9 @@ for (let n = 1; n <= 5; n++) {
       });
 
       // 3. Ground / Server Corridor Runway
-      ctx.fillStyle = '#111827';
+      ctx.fillStyle = pal.ground;
       ctx.fillRect(0, height - 48, width, 48);
-      ctx.strokeStyle = '#10b981';
+      ctx.strokeStyle = pal.groundLine;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(0, height - 48);
@@ -1083,7 +1222,7 @@ for (let n = 1; n <= 5; n++) {
 
       // Runway light lines
       const laneOffset = (runCycle * 2.5) % 40;
-      ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)';
+      ctx.strokeStyle = pal.lane;
       ctx.setLineDash([15, 25]);
       ctx.lineDashOffset = -laneOffset;
       ctx.beginPath();
@@ -1173,7 +1312,7 @@ for (let n = 1; n <= 5; n++) {
       const bob = isJumping ? 0 : Math.sin(runCycle * 0.3) * 2;
 
       // Shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.fillStyle = canvasPalette().shadow;
       ctx.beginPath();
       ctx.ellipse(x + 14, runnerBaseY + 36, 12, 4, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -1610,6 +1749,7 @@ for (let n = 1; n <= 5; n++) {
 
     window.onload = function() {
       loadProgress();
+      applyTheme();
       document.getElementById('topScoreValue').innerText = `${gameState.topScore.toLocaleString()} Pts`;
       document.getElementById('topPlayerRole').innerText = gameState.topPlayer;
       document.getElementById('selectedCharRole').innerText = selectedCharacter.name;
