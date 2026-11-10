@@ -148,6 +148,16 @@
     body.proyektor .custom-scrollbar::-webkit-scrollbar-track { background: #e2e8f0; }
     body.proyektor .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8; }
     body.proyektor .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    /* Permukaan "terminal" yang tertinggal gelap pada perbaikan pertama:
+       kotak rumus di modal Materi (bg-black/60, hanya dipakai di sana),
+       blok kode di modal Materi, dan kotak kode soal di layar permainan.
+       Latar modal (bg-black/80 sebagai backdrop) sengaja TIDAK diubah. */
+    body.proyektor #materiModal .bg-black\/60 { background-color: #eef4fb; }
+    body.proyektor #materiModal pre { background-color: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; }
+    body.proyektor #codeSnippetWrap { background-color: #f1f5f9; }
+    body.proyektor #currentQuestionText { color: #0f172a; }
+    body.proyektor .hover\:text-white:hover { color: #0f172a; }
+    body.proyektor .border-cyber-border\/80 { border-color: rgba(148, 163, 184, 0.7); }
   </style>
 </head>
 <body class="bg-cyber-dark text-slate-100 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-emerald-500 selection:text-black">
@@ -338,7 +348,7 @@
           </div>
 
           <!-- Code Snippet Box -->
-          <div class="bg-black/80 rounded-lg p-3 border border-slate-800 font-mono text-xs text-emerald-300 overflow-x-auto custom-scrollbar mb-3">
+          <div id="codeSnippetWrap" class="bg-black/80 rounded-lg p-3 border border-slate-800 font-mono text-xs text-emerald-300 overflow-x-auto custom-scrollbar mb-3">
             <pre id="codeSnippetBox"><code>// Loading script...</code></pre>
           </div>
 
